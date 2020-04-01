@@ -88,8 +88,7 @@ class TSPGame(Game):
         else:
             # visit the start node and add its distance to complete the cycle
             current_path_length = self.env.get_weight(board, self.start_node)
-            if current_path_length <= (1.1 * self.env.optimal_path_length):
-                # print('SUCCESS')
+            if current_path_length == (1.0 * self.env.optimal_path_length):
                 return 1
             else:
                 return -1
@@ -131,7 +130,9 @@ class TSPGame(Game):
         Returns:
             boardString: a quick conversion of board to a string format.
                          Required by MCTS for hashing.
-
-        TODO make this unique for each board / end state, the string representation is the path!
         """
+
+        # the path is the string representation
+        # since the game board is the same for each mcts instance,
+        # path is enough to tell game states apart
         return str(board[2])

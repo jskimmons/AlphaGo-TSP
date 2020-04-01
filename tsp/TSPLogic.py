@@ -32,10 +32,10 @@ class TSPEnviornment:
                     if graph[dst][src] != 0:
                         graph[src][dst] = graph[dst][src]
                     else:
-                        graph[src][dst] = random.randint(0, 100)
+                        graph[src][dst] = random.randint(0, 1000)
         # get optimal solution
         self.optimal_path_length, self.solution = self.compute_solution(graph, start_node)
-        print('sol', self.solution)
+        # print('sol', self.solution)
         first_layer = graph
         second_layer = np.tile(visited_nodes, (self.nodes, 1))
         third_layer = np.tile(start_node, (self.nodes, self.nodes))

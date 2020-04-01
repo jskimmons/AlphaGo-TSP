@@ -9,9 +9,10 @@ class PureMCTS():
     This class handles the MCTS tree.
     """
 
-    def __init__(self, game, args):
-        self.game = game
+    def __init__(self, args, game, nnet):
         self.args = args
+        self.game = game
+        self.nnet = nnet
         self.Qsa = {}  # stores Q values for s,a (as defined in the paper)
         self.Nsa = {}  # stores #times edge s,a was visited
         self.Ns = {}  # stores #times board s was visited
@@ -30,7 +31,6 @@ class PureMCTS():
                    proportional to Nsa[(s,a)]**(1./temp)
         """
         for i in range(self.args.numMCTSSims):
-            # print('-----------------')
             self.search(canonicalBoard)
 
         s = self.game.stringRepresentation(canonicalBoard)
@@ -64,20 +64,16 @@ class PureMCTS():
         """
 
         s = self.game.stringRepresentation(canonicalBoard)
-        # print(s)
 
         if s not in self.Es:
             self.Es[s] = self.game.getGameEnded(canonicalBoard, 1)
         if self.Es[s] != 0:
             # terminal node
             return self.Es[s]
-        # ended = self.game.getGameEnded(canonicalBoard, 1)
-        # if ended != 0:
-        #     return ended
 
         if s not in self.Ps:
             # leaf node
-            self.Ps[s], v = np.ones(self.game.getActionSize()), 0  # uniform dist
+            self.Ps[s], v = self.nnet.predict(canonicalBoard)  # uniform dist
             valids = self.game.getValidMoves(canonicalBoard, 1)
             self.Ps[s] = self.Ps[s] * valids  # masking invalid moves
             sum_Ps_s = np.sum(self.Ps[s])

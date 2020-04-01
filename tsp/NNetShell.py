@@ -22,9 +22,14 @@ class NNetShell(NeuralNet):
         """
         board: np array with board
         """
-        valid_moves = self.game.getValidMoves(board, 1)
-        pi = valid_moves / sum(valid_moves)
-        return pi, 0
+        # uniform approach
+        # return np.ones(self.game.getActionSize()), 0
+
+        # greedy approach
+        cur_node = int(board[0][2][0][0])
+        pi = board[0][0][cur_node]
+        return 1000 - pi, 0
+
 
     def save_checkpoint(self, folder, filename):
         pass
