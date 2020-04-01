@@ -2,6 +2,7 @@ from __future__ import print_function
 from Game import Game
 from tsp.TSPLogic import TSPEnviornment
 
+import numpy as np
 import random
 
 
@@ -69,7 +70,12 @@ class TSPGame(Game):
                         moves that are valid from the current board and player,
                         0 for invalid moves
         """
-        return (board[0][1][0] - 1) * -1
+        # this is any move not already seen in the path
+        graph, path = board
+        valid_moves = np.ones(shape=(self.getActionSize(),), dtype=np.int32)
+        for node in path:
+            valid_moves[node] = 0
+        return valid_moves
 
     def getGameEnded(self, board, player):
         """
@@ -83,12 +89,12 @@ class TSPGame(Game):
 
         """
         # if any of these values in the board[1][0] are 0, game is not over
-        if not board[0][1][0].all():
+        if sum(self.getValidMoves(board, player)) != 0:
             return 0
         else:
-            # visit the start node and add its distance to complete the cycle
-            current_path_length = self.env.get_weight(board, self.start_node)
-            if current_path_length == (1.0 * self.env.optimal_path_length):
+            # calculate the path length
+            current_path_length = self.env.get_path_length(board)
+            if current_path_length <= (1.1 * self.env.optimal_path_length):
                 return 1
             else:
                 return -1
@@ -135,4 +141,4 @@ class TSPGame(Game):
         # the path is the string representation
         # since the game board is the same for each mcts instance,
         # path is enough to tell game states apart
-        return str(board[2])
+        return str(board)

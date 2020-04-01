@@ -7,7 +7,7 @@ from utils import *
 
 args = dotdict({
     'numEps': 5,              # Number of complete self-play games to simulate during a new iteration.
-    'numMCTSSims': 1500,          # Number of games moves for MCTS to simulate.
+    'numMCTSSims': 1000,          # Number of games moves for MCTS to simulate.
     'cpuct': 1,
 
 })
@@ -15,12 +15,13 @@ args = dotdict({
 if __name__ == "__main__":
     game = Game(10)
     nnet = NNetShell(game)
+    mcts = PureMCTS(args, game, nnet)
     # actions = [game.start_node]
     wins, losses = 0, 0
     player = 1
     for i in tqdm(range(args.numEps)):
         board = game.getInitBoard()
-        mcts = PureMCTS(args, game, nnet)
+        # mcts = PureMCTS(args, game, nnet)
         while game.getGameEnded(board, player) == 0:
             canon = game.getCanonicalForm(board, player)
             ap = mcts.getActionProb(canon, temp=1)

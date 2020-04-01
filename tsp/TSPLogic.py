@@ -22,8 +22,6 @@ class TSPEnviornment:
 
     def new_board(self, start_node):
         graph = np.zeros(shape=(self.nodes, self.nodes), dtype=np.float32)
-        visited_nodes = np.zeros((self.nodes,))
-        visited_nodes[start_node] = 1
         path = [start_node]
         for src in range(self.nodes):
             for dst in range(self.nodes):
@@ -36,26 +34,30 @@ class TSPEnviornment:
         # get optimal solution
         self.optimal_path_length, self.solution = self.compute_solution(graph, start_node)
         # print('sol', self.solution)
-        first_layer = graph
-        second_layer = np.tile(visited_nodes, (self.nodes, 1))
-        third_layer = np.tile(start_node, (self.nodes, self.nodes))
-        return np.stack((first_layer, second_layer, third_layer), axis=0), 0, path
+        return graph, path
 
     def visit_node(self, board, dst):
-        board, current_path_length, path = board
+        board, path = board
         new_board = np.copy(board)
         new_path = path.copy()
-        new_board[1][:,dst] = 1
-        src = int(board[2][0][0])
-        current_path_length += new_board[0][src][dst]
         new_path.append(dst)
-        new_board[2][:,:] = dst
-        return new_board, current_path_length, new_path
+        return new_board, new_path
 
     def get_weight(self, board, dst):
         board, current_path_length, _ = board
         src = int(board[2][0][0])
         return current_path_length + board[0][src][dst]
+
+    def get_path_length(self, board):
+        graph, path = board
+        path_length = 0
+        for i in range(1, len(path)):
+            src = path[i-1]
+            dst = path[i]
+            path_length += graph[src][dst]
+        # complete the cycle
+        path_length += graph[path[-1]][path[0]]
+        return path_length
 
     def get_optimal_length(self):
         return self.optimal_path_length

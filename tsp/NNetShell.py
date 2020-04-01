@@ -26,8 +26,9 @@ class NNetShell(NeuralNet):
         # return np.ones(self.game.getActionSize()), 0
 
         # greedy approach
-        cur_node = int(board[0][2][0][0])
-        pi = board[0][0][cur_node]
+        graph, path = board
+        cur_node = path[-1]
+        pi = graph[cur_node]
         return 1000 - pi, 0
 
 
