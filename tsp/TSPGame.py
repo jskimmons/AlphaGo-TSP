@@ -16,7 +16,7 @@ class TSPGame(Game):
     See othello/OthelloGame.py for an example implementation.
     """
 
-    def __init__(self, nodes=10):
+    def __init__(self, nodes):
         Game.__init__(self)
         self.env = TSPEnviornment(nodes=nodes)
         self.start_node = random.randint(0, nodes-1)
@@ -69,8 +69,7 @@ class TSPGame(Game):
                         moves that are valid from the current board and player,
                         0 for invalid moves
         """
-        board = board[0]
-        return (board[1][0] - 1) * -1
+        return (board[0][1][0] - 1) * -1
 
     def getGameEnded(self, board, player):
         """
@@ -84,13 +83,13 @@ class TSPGame(Game):
 
         """
         # if any of these values in the board[1][0] are 0, game is not over
-        board, current_path_length = board
-        if not board[1][0].all():  # extra index is bc board is a tuple including path length now # TODO path not just score
+        if not board[0][1][0].all():
             return 0
         else:
-            # visit the start node and add its distance
-            board, current_path_length = self.env.visit_node((board, current_path_length), self.start_node)
+            # visit the start node and add its distance to complete the cycle
+            current_path_length = self.env.get_weight(board, self.start_node)
             if current_path_length <= (1.1 * self.env.optimal_path_length):
+                # print('SUCCESS')
                 return 1
             else:
                 return -1
@@ -132,5 +131,7 @@ class TSPGame(Game):
         Returns:
             boardString: a quick conversion of board to a string format.
                          Required by MCTS for hashing.
+
+        TODO make this unique for each board / end state, the string representation is the path!
         """
-        return str(board)
+        return str(board[2])

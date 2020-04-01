@@ -22,10 +22,9 @@ class NNetShell(NeuralNet):
         """
         board: np array with board
         """
-        # get valid moves and choose one at random
         valid_moves = self.game.getValidMoves(board, 1)
-        pi = valid_moves / len(valid_moves)
-        return pi, 1
+        pi = valid_moves / sum(valid_moves)
+        return pi, 0
 
     def save_checkpoint(self, folder, filename):
         pass

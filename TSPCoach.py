@@ -1,5 +1,5 @@
 from collections import deque
-from Arena import Arena
+from Arena import SinglePlayerArena
 from TSPMCTS import TSPMCTS
 import numpy as np
 from pytorch_classification.utils import Bar, AverageMeter
@@ -22,6 +22,8 @@ class TSPCoach():
         self.mcts = TSPMCTS(self.game, self.nnet, self.args)
         self.trainExamplesHistory = []  # history of examples from args.numItersForTrainExamplesHistory latest iterations
         self.skipFirstSelfPlay = False  # can be overriden in loadTrainExamples()
+        self.wins = 0
+        self.losses = 0
 
     def executeEpisode(self):
         """
@@ -120,13 +122,12 @@ class TSPCoach():
             self.nnet.train(trainExamples)
             nmcts = TSPMCTS(self.game, self.nnet, self.args)
 
-            print('PITTING AGAINST PREVIOUS VERSION')
-            arena = Arena(lambda x: np.argmax(pmcts.getActionProb(x, temp=0)),
-                          lambda x: np.argmax(nmcts.getActionProb(x, temp=0)), self.game)
-            pwins, nwins, draws = arena.playGames(self.args.arenaCompare)
+            print('PLAYING GAMES')
+            arena = SinglePlayerArena(lambda x: np.argmax(pmcts.getActionProb(x, temp=0)), self.game)
+            wins, losses, draws = arena.playSinglePlayerGames(self.args.arenaCompare)
 
-            print('NEW/PREV WINS : %d / %d ; DRAWS : %d' % (nwins, pwins, draws))
-            if pwins + nwins == 0 or float(nwins) / (pwins + nwins) < self.args.updateThreshold:
+            print('WINS/LOSSES: %d / %d ; DRAWS : %d' % (wins, losses, draws))
+            if wins == 0 or float(wins) / (wins + losses) < self.args.updateThreshold:
                 print('REJECTING NEW MODEL')
                 self.nnet.load_checkpoint(folder=self.args.checkpoint, filename='temp.pth.tar')
             else:
