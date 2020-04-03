@@ -4,15 +4,15 @@ import numpy as np
 EPS = 1e-8
 
 
-class TSPMCTS():
+class TSPMCTS:
     """
     This class handles the MCTS tree.
     """
 
-    def __init__(self, game, nnet, args):
+    def __init__(self, args, game, nnet):
+        self.args = args
         self.game = game
         self.nnet = nnet
-        self.args = args
         self.Qsa = {}  # stores Q values for s,a (as defined in the paper)
         self.Nsa = {}  # stores #times edge s,a was visited
         self.Ns = {}  # stores #times board s was visited
@@ -69,13 +69,13 @@ class TSPMCTS():
             self.Es[s] = self.game.getGameEnded(canonicalBoard, 1)
         if self.Es[s] != 0:
             # terminal node
-            return -self.Es[s]
+            return self.Es[s]
 
         if s not in self.Ps:
             # leaf node
-            self.Ps[s], v = self.nnet.predict(canonicalBoard)
+            self.Ps[s], v = self.nnet.predict(canonicalBoard)  # uniform dist
             valids = self.game.getValidMoves(canonicalBoard, 1)
-            self.Ps[s] = self.Ps[s] * valids  # masking invalid moves
+            self.Ps[s] = self.Ps[s].numpy() * valids  # masking invalid moves
             sum_Ps_s = np.sum(self.Ps[s])
             if sum_Ps_s > 0:
                 self.Ps[s] /= sum_Ps_s  # renormalize

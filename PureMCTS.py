@@ -4,7 +4,7 @@ import numpy as np
 EPS = 1e-8
 
 
-class PureMCTS():
+class PureMCTS:
     """
     This class handles the MCTS tree.
     """

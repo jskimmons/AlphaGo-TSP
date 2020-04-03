@@ -1,9 +1,5 @@
 from NeuralNet import NeuralNet
 
-import time
-import numpy as np
-import sys
-
 
 class NNetShell(NeuralNet):
 
@@ -25,7 +21,7 @@ class NNetShell(NeuralNet):
         # uniform approach
         # return np.ones(self.game.getActionSize()), 0
 
-        # greedy approach
+        # greedy approach based on weight of edges
         graph, path = board
         cur_node = path[-1]
         pi = graph[cur_node]
